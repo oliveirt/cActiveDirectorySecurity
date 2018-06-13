@@ -1,4 +1,4 @@
-# Project Title
+# cActiveDirectorySecurity
 
 The cActiveDirectorySecurity module contains PowerShell Functions which are designed to report on and manipulate Access Control Lists on Active Directory Objects in an intuitive manner. One of the key benefits of the module is the conversion of Schema GUIDs and Access Right GUIDs into meaningful Object, Attribute or Access Rights names. The Functions will also integrate seamlessly with native Active Directory CmdLets (such as Get-ADObject, Get-ADUser, Get-ADGroup and Get-ADOrganizationalUnit).
 
