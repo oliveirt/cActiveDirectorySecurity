@@ -420,9 +420,9 @@ function Get-ADObjectAcl
                 "InheritedObjectType"
                 "InheritedObjectTypeName"
                 "AccessControlType"
-                "PropogationFlags"
+                "PropagationFlags"
                 "IsInherited"
-                "InheritedFlags"
+                "InheritanceFlags"
                 "ObjectFlags"
                 "InheritanceType"
             )
