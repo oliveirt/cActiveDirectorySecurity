@@ -1,0 +1,326 @@
+[
+    {
+        "name": "Domain-Administer-Server",
+        "rightsGUID": "ab721a52-1e2f-11d0-9819-00aa0040529b"
+    },
+    {
+        "name": "User-Change-Password",
+        "rightsGUID": "ab721a53-1e2f-11d0-9819-00aa0040529b"
+    },
+    {
+        "name": "User-Force-Change-Password",
+        "rightsGUID": "00299570-246d-11d0-a768-00aa006e0529"
+    },
+    {
+        "name": "Send-As",
+        "rightsGUID": "ab721a54-1e2f-11d0-9819-00aa0040529b"
+    },
+    {
+        "name": "Receive-As",
+        "rightsGUID": "ab721a56-1e2f-11d0-9819-00aa0040529b"
+    },
+    {
+        "name": "Send-To",
+        "rightsGUID": "ab721a55-1e2f-11d0-9819-00aa0040529b"
+    },
+    {
+        "name": "Domain-Password",
+        "rightsGUID": "c7407360-20bf-11d0-a768-00aa006e0529"
+    },
+    {
+        "name": "General-Information",
+        "rightsGUID": "59ba2f42-79a2-11d0-9020-00c04fc2d3cf"
+    },
+    {
+        "name": "User-Account-Restrictions",
+        "rightsGUID": "4c164200-20c0-11d0-a768-00aa006e0529"
+    },
+    {
+        "name": "User-Logon",
+        "rightsGUID": "5f202010-79a5-11d0-9020-00c04fc2d4cf"
+    },
+    {
+        "name": "Membership",
+        "rightsGUID": "bc0ac240-79a9-11d0-9020-00c04fc2d4cf"
+    },
+    {
+        "name": "Open-Address-Book",
+        "rightsGUID": "a1990816-4298-11d1-ade2-00c04fd8d5cd"
+    },
+    {
+        "name": "Personal-Information",
+        "rightsGUID": "77B5B886-944A-11d1-AEBD-0000F80367C1"
+    },
+    {
+        "name": "Email-Information",
+        "rightsGUID": "E45795B2-9455-11d1-AEBD-0000F80367C1"
+    },
+    {
+        "name": "Web-Information",
+        "rightsGUID": "E45795B3-9455-11d1-AEBD-0000F80367C1"
+    },
+    {
+        "name": "DS-Replication-Get-Changes",
+        "rightsGUID": "1131f6aa-9c07-11d1-f79f-00c04fc2dcd2"
+    },
+    {
+        "name": "DS-Replication-Synchronize",
+        "rightsGUID": "1131f6ab-9c07-11d1-f79f-00c04fc2dcd2"
+    },
+    {
+        "name": "DS-Replication-Manage-Topology",
+        "rightsGUID": "1131f6ac-9c07-11d1-f79f-00c04fc2dcd2"
+    },
+    {
+        "name": "Change-Schema-Master",
+        "rightsGUID": "e12b56b6-0a95-11d1-adbb-00c04fd8d5cd"
+    },
+    {
+        "name": "Change-Rid-Master",
+        "rightsGUID": "d58d5f36-0a98-11d1-adbb-00c04fd8d5cd"
+    },
+    {
+        "name": "Do-Garbage-Collection",
+        "rightsGUID": "fec364e0-0a98-11d1-adbb-00c04fd8d5cd"
+    },
+    {
+        "name": "Recalculate-Hierarchy",
+        "rightsGUID": "0bc1554e-0a99-11d1-adbb-00c04fd8d5cd"
+    },
+    {
+        "name": "Allocate-Rids",
+        "rightsGUID": "1abd7cf8-0a99-11d1-adbb-00c04fd8d5cd"
+    },
+    {
+        "name": "Change-PDC",
+        "rightsGUID": "bae50096-4752-11d1-9052-00c04fc2d4cf"
+    },
+    {
+        "name": "Add-GUID",
+        "rightsGUID": "440820ad-65b4-11d1-a3da-0000f875ae0d"
+    },
+    {
+        "name": "Change-Domain-Master",
+        "rightsGUID": "014bf69c-7b3b-11d1-85f6-08002be74fab"
+    },
+    {
+        "name": "Public-Information",
+        "rightsGUID": "e48d0154-bcf8-11d1-8702-00c04fb96050"
+    },
+    {
+        "name": "msmq-Receive-Dead-Letter",
+        "rightsGUID": "4b6e08c0-df3c-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Peek-Dead-Letter",
+        "rightsGUID": "4b6e08c1-df3c-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Receive-computer-Journal",
+        "rightsGUID": "4b6e08c2-df3c-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Peek-computer-Journal",
+        "rightsGUID": "4b6e08c3-df3c-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Receive",
+        "rightsGUID": "06bd3200-df3e-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Peek",
+        "rightsGUID": "06bd3201-df3e-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Send",
+        "rightsGUID": "06bd3202-df3e-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Receive-journal",
+        "rightsGUID": "06bd3203-df3e-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "msmq-Open-Connector",
+        "rightsGUID": "b4e60130-df3f-11d1-9c86-006008764d0e"
+    },
+    {
+        "name": "Apply-Group-Policy",
+        "rightsGUID": "edacfd8f-ffb3-11d1-b41d-00a0c968f939"
+    },
+    {
+        "name": "RAS-Information",
+        "rightsGUID": "037088f8-0ae1-11d2-b422-00a0c968f939"
+    },
+    {
+        "name": "DS-Install-Replica",
+        "rightsGUID": "9923a32a-3607-11d2-b9be-0000f87a36b2"
+    },
+    {
+        "name": "Change-Infrastructure-Master",
+        "rightsGUID": "cc17b1fb-33d9-11d2-97d4-00c04fd8d5cd"
+    },
+    {
+        "name": "Update-Schema-Cache",
+        "rightsGUID": "be2bb760-7f46-11d2-b9ad-00c04f79f805"
+    },
+    {
+        "name": "Recalculate-Security-Inheritance",
+        "rightsGUID": "62dd28a8-7f46-11d2-b9ad-00c04f79f805"
+    },
+    {
+        "name": "DS-Check-Stale-Phantoms",
+        "rightsGUID": "69ae6200-7f46-11d2-b9ad-00c04f79f805"
+    },
+    {
+        "name": "Certificate-Enrollment",
+        "rightsGUID": "0e10c968-78fb-11d2-90d4-00c04f79dc55"
+    },
+    {
+        "name": "Self-Membership",
+        "rightsGUID": "bf9679c0-0de6-11d0-a285-00aa003049e2"
+    },
+    {
+        "name": "Validated-DNS-Host-Name",
+        "rightsGUID": "72e39547-7b18-11d1-adef-00c04fd8d5cd"
+    },
+    {
+        "name": "Validated-SPN",
+        "rightsGUID": "f3a64788-5306-11d1-a9c5-0000f80367c1"
+    },
+    {
+        "name": "Generate-RSoP-Planning",
+        "rightsGUID": "b7b1b3dd-ab09-4242-9e30-9980e5d322f7"
+    },
+    {
+        "name": "Refresh-Group-Cache",
+        "rightsGUID": "9432c620-033c-4db7-8b58-14ef6d0bf477"
+    },
+    {
+        "name": "SAM-Enumerate-Entire-Domain",
+        "rightsGUID": "91d67418-0135-4acc-8d79-c08e857cfbec"
+    },
+    {
+        "name": "Generate-RSoP-Logging",
+        "rightsGUID": "b7b1b3de-ab09-4242-9e30-9980e5d322f7"
+    },
+    {
+        "name": "Domain-Other-Parameters",
+        "rightsGUID": "b8119fd0-04f6-4762-ab7a-4986c76b3f9a"
+    },
+    {
+        "name": "DNS-Host-Name-Attributes",
+        "rightsGUID": "72e39547-7b18-11d1-adef-00c04fd8d5cd"
+    },
+    {
+        "name": "Create-Inbound-Forest-Trust",
+        "rightsGUID": "e2a36dc9-ae17-47c3-b58b-be34c55ba633"
+    },
+    {
+        "name": "DS-Replication-Get-Changes-All",
+        "rightsGUID": "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2"
+    },
+    {
+        "name": "Migrate-SID-History",
+        "rightsGUID": "BA33815A-4F93-4c76-87F3-57574BFF8109"
+    },
+    {
+        "name": "Reanimate-Tombstones",
+        "rightsGUID": "45EC5156-DB7E-47bb-B53F-DBEB2D03C40F"
+    },
+    {
+        "name": "Allowed-To-Authenticate",
+        "rightsGUID": "68B1D179-0D15-4d4f-AB71-46152E79A7BC"
+    },
+    {
+        "name": "DS-Execute-Intentions-Script",
+        "rightsGUID": "2f16c4a5-b98e-432c-952a-cb388ba33f2e"
+    },
+    {
+        "name": "DS-Replication-Monitor-Topology",
+        "rightsGUID": "f98340fb-7c5b-4cdb-a00b-2ebdfa115a96"
+    },
+    {
+        "name": "Update-Password-Not-Required-Bit",
+        "rightsGUID": "280f369c-67c7-438e-ae98-1d46f3c6f541"
+    },
+    {
+        "name": "Unexpire-Password",
+        "rightsGUID": "ccc2dc7d-a6ad-4a7a-8846-c04e3cc53501"
+    },
+    {
+        "name": "Enable-Per-User-Reversibly-Encrypted-Password",
+        "rightsGUID": "05c74c5e-4deb-43b4-bd9f-86664c2a7fd5"
+    },
+    {
+        "name": "DS-Query-Self-Quota",
+        "rightsGUID": "4ecc03fe-ffc0-4947-b630-eb672a8a9dbc"
+    },
+    {
+        "name": "Private-Information",
+        "rightsGUID": "91e647de-d96f-4b70-9557-d63ff4f3ccd8"
+    },
+    {
+        "name": "Read-Only-Replication-Secret-Synchronization",
+        "rightsGUID": "1131f6ae-9c07-11d1-f79f-00c04fc2dcd2"
+    },
+    {
+        "name": "MS-TS-GatewayAccess",
+        "rightsGUID": "ffa6f046-ca4b-4feb-b40d-04dfee722543"
+    },
+    {
+        "name": "Terminal-Server-License-Server",
+        "rightsGUID": "5805bc62-bdc9-4428-a5e2-856a0f4c185e"
+    },
+    {
+        "name": "Reload-SSL-Certificate",
+        "rightsGUID": "1a60ea8d-58a6-4b20-bcdc-fb71eb8a9ff8"
+    },
+    {
+        "name": "DS-Replication-Get-Changes-In-Filtered-Set",
+        "rightsGUID": "89e95b76-444d-4c62-991a-0facbeda640c"
+    },
+    {
+        "name": "Run-Protect-Admin-Groups-Task",
+        "rightsGUID": "7726b9d5-a4b4-4288-a6b2-dce952e80a7f"
+    },
+    {
+        "name": "Manage-Optional-Features",
+        "rightsGUID": "7c0e2a7c-a419-48e4-a995-10180aad54dd"
+    },
+    {
+        "name": "DS-Clone-Domain-Controller",
+        "rightsGUID": "3e0f7e18-2c7a-4c10-ba82-4d926db99a3e"
+    },
+    {
+        "name": "Validated-MS-DS-Behavior-Version",
+        "rightsGUID": "d31a8757-2447-4545-8081-3bb610cacbf2"
+    },
+    {
+        "name": "Validated-MS-DS-Additional-DNS-Host-Name",
+        "rightsGUID": "80863791-dbe9-4eb8-837e-7f0ab55d9ac7"
+    },
+    {
+        "name": "Certificate-AutoEnrollment",
+        "rightsGUID": "a05b8cc2-17bc-4802-a710-e7c15ab866a2"
+    },
+    {
+        "name": "DS-Set-Owner",
+        "rightsGUID": "4125c71f-7fac-4ff0-bcb7-f09a41325286"
+    },
+    {
+        "name": "DS-Bypass-Quota",
+        "rightsGUID": "88a9933e-e5c8-4f2a-9dd7-2527416b8092"
+    },
+    {
+        "name": "DS-Read-Partition-Secrets",
+        "rightsGUID": "084c93a2-620d-4879-a836-f0ae47de0e89"
+    },
+    {
+        "name": "DS-Write-Partition-Secrets",
+        "rightsGUID": "94825A8D-B171-4116-8146-1E34D8F54401"
+    },
+    {
+        "name": "DS-Validated-Write-Computer",
+        "rightsGUID": "9b026da6-0d3c-465c-8bee-5199d7165cba"
+    }
+]

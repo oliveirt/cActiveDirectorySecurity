@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>cActiveDirectoryPermission.ACE</Name>
+    <Members>
+        <ScriptProperty>
+            <Name>IdentityReferenceDomain</Name>
+            <GetScriptBlock>
+                $IdentityComponents = ($this.IdentityReference -split '\\')
+                if ($IdentityComponents.count -gt 1)
+                {
+                    $IdentityReferenceDomain = $IdentityComponents[0]
+                }
+                else
+                {
+                    $IdentityReferenceDomain = ""
+                }
+                $IdentityReferenceDomain
+            </GetScriptBlock>
+        </ScriptProperty>
+        <ScriptProperty>
+            <Name>IdentityReferenceName</Name>
+            <GetScriptBlock>
+                $IdentityComponents = ($this.IdentityReference -split '\\')
+                if ($IdentityComponents.count -gt 1)
+                {
+                    $IdentityReferenceName = $IdentityComponents[1]
+                }
+                else
+                {
+                    $IdentityReferenceName = $IdentityComponents[0]
+                }
+                $IdentityReferenceName
+            </GetScriptBlock>
+        </ScriptProperty>
+        <MemberSet>
+            <Name>PSStandardMembers</Name>
+                <Members>
+                <PropertySet>
+                    <Name>DefaultDisplayPropertySet</Name>
+                    <ReferencedProperties>
+                        <Name>distinguishedName</Name>
+                        <Name>IdentityReference</Name>
+                        <Name>IdentityReferenceName</Name>
+                        <Name>IdentityReferenceDomain</Name>
+                        <Name>ActiveDirectoryRights</Name>
+                        <Name>ObjectType</Name>
+                        <Name>ObjectTypeName</Name>
+                        <Name>InheritedObjectType</Name>
+                        <Name>InheritedObjectTypeName</Name>
+                        <Name>AccessControlType</Name>
+                        <Name>PropagationFlags</Name>
+                        <Name>IsInherited</Name>
+                        <Name>InheritanceFlags</Name>
+                        <Name>ObjectFlags</Name>
+                        <Name>InheritanceType</Name>
+                    </ReferencedProperties>
+                </PropertySet>
+                </Members>
+        </MemberSet>
+    </Members>
+  </Type>
+</Types>

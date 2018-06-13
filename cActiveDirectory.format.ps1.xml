@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>cActiveDirectoryPermission.ACE.List</Name>
+            <ViewSelectedBy>
+                <TypeName>cActiveDirectoryPermission.ACE</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>distinguishedName</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IdentityReference</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>ActiveDirectoryRights</Label>
+                                <ScriptBlock>$_.ActiveDirectoryRights -join ", "</ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ObjectTypeName</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>InheritedObjectTypeName</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>AccessControlType</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>PropagationFlags</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IsInherited</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>InheritanceFlags</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>ObjectFlags</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>InheritanceType</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
