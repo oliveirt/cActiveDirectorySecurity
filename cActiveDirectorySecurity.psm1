@@ -374,9 +374,9 @@ function Get-ADObjectAcl
                 InheritanceFlags        = $Permission.InheritanceFlags
                 PropagationFlags        = $Permission.PropagationFlags
             }
-            $reportItem.PSObject.TypeNames.Insert(0, "cActiveDirectoryPermission.ACE")
+            $reportItem.PSObject.TypeNames.Insert(0, "cActiveDirectorySecurity.ACE")
 
-            # apply additional filters for those properties associated with cActiveDirectoryPermission.ACE type
+            # apply additional filters for those properties associated with cActiveDirectorySecurity.ACE type
             if ($PSBoundParameters.ContainsKey('IdentityReferenceName'))
             {
                 if ($reportItem.IdentityReferenceName -ne $IdentityReferenceName)
@@ -476,7 +476,7 @@ function Get-ADObjectAcl
 .INPUTS
    The identity parameter of the CmdLet accepts either a distinguishedName or ObjectGUID or AD Objects. AD Objects which are passed by reference must include either a distinguishedName or ObjectGUID property.
 .OUTPUTS
-   None unless -WhatIf parameter is used in which case a cActiveDirectoryPermission.ACE object is returned.
+   None unless -WhatIf parameter is used in which case a cActiveDirectorySecurity.ACE object is returned.
 #>
 function Add-ADObjectAce
 {
@@ -782,7 +782,7 @@ function Add-ADObjectAce
                 InheritanceFlags        = $Ace.InheritanceFlags
                 PropagationFlags        = $Ace.PropagationFlags
             }
-            $AceToOutput.PSObject.TypeNames.Insert(0, "cActiveDirectoryPermission.ACE")
+            $AceToOutput.PSObject.TypeNames.Insert(0, "cActiveDirectorySecurity.ACE")
             Write-Output $AceToOutput
         }
     }
@@ -829,7 +829,7 @@ function Add-ADObjectAce
 .INPUTS
    The identity parameter of the CmdLet accepts either a distinguishedName or ObjectGUID or AD Objects. AD Objects which are passed by reference must include either a distinguishedName or ObjectGUID property.
 .OUTPUTS
-   None unless -WhatIf parameter is used in which case a cActiveDirectoryPermission.ACE object is returned.
+   None unless -WhatIf parameter is used in which case a cActiveDirectorySecurity.ACE object is returned.
 #>
 function Remove-ADObjectAce
 {
@@ -963,7 +963,7 @@ function Remove-ADObjectAce
             Pop-Location -StackName 'Remote-ADObjectAce' -ErrorAction SilentlyContinue 
         }
 
-        # where the Get-ADObjectAcl function is used to feed this function the reference object passed will be of type cActiveDirectoryPermission.ACE
+        # where the Get-ADObjectAcl function is used to feed this function the reference object passed will be of type cActiveDirectorySecurity.ACE
         # therefore ensure it gets converted to an appropriate AD object
         if ("Get-ADObjectAcl" -eq (Get-PSCallStack)[1].Command)
         {
@@ -1150,7 +1150,7 @@ function Remove-ADObjectAce
                 InheritanceFlags        = $MatchedAce.InheritanceFlags
                 PropagationFlags        = $MatchedAce.PropagationFlags
             }
-            $AceToOutput.PSObject.TypeNames.Insert(0, "cActiveDirectoryPermission.ACE")
+            $AceToOutput.PSObject.TypeNames.Insert(0, "cActiveDirectorySecurity.ACE")
             Write-Output $AceToOutput
         }
     }

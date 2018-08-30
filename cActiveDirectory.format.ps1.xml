@@ -2,9 +2,9 @@
 <Configuration>
     <ViewDefinitions>
         <View>
-            <Name>cActiveDirectoryPermission.ACE.List</Name>
+            <Name>cActiveDirectorySecurity.ACE.List</Name>
             <ViewSelectedBy>
-                <TypeName>cActiveDirectoryPermission.ACE</TypeName>
+                <TypeName>cActiveDirectorySecurity.ACE</TypeName>
             </ViewSelectedBy>
             <ListControl>
                 <ListEntries>

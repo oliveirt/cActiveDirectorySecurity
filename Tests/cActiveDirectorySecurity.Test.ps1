@@ -240,8 +240,6 @@ try
             Context "The specified Identity Reference cannot be translated to a Sid." {
                 $Identity = New-Object -TypeName PSObject -Property @{"Name" = "Domain Controllers"; "DistinguishedName" = "OU=Domain Controllers,DC=contoso,DC=com"}
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Domain Admins"} -MockWith { Return $null }
-                # Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
-                # Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
                 Mock -CommandName Write-Warning -MockWith { } -ParameterFilter {$Message -eq "An error occurred translating the Identity Reference ('CONTOSO\Domain Admins') to a Sid value. Processing cannot continue."} -Verifiable
                 It "Generates a warning message when the specified Identity Reference cannot be translated into an object Sid value." {
                     Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Domain Admins" -ActiveDirectoryRights CreateChild, DeleteChild -ObjectTypeName 'Computers' -InheritedObjectTypeName 'All'  | Should Be $null
