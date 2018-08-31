@@ -51,7 +51,7 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    RequiredModules   = @("ActiveDirectory")
+    # RequiredModules   = @()
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @()
@@ -110,7 +110,7 @@
             # ReleaseNotes = ''
 
             # External dependent modules of this module
-            ExternalModuleDependencies = 'ActiveDirectory'
+            ExternalModuleDependencies = @('ActiveDirectory')
 
         } # End of PSData hashtable
 
