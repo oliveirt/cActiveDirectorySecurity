@@ -95,7 +95,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('Active Directory', "Security", "ACL", "ACE", "Access Control List", "Access Control Entry")
+            Tags = @('ActiveDirectory', "Security", "ACL", "ACE")
 
             # A URL to the license for this module.
             LicenseUri = 'https://github.com/oliveirt/cActiveDirectorySecurity/blob/master/License.md'
