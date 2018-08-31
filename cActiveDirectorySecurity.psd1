@@ -30,7 +30,7 @@
     Copyright         = '(c) 2018 Tony Oliveira. All rights reserved.'
 
     # Description of the functionality provided by this module
-    # Description = ''
+    Description = 'Module containing functions which are designed to report on and manipulate Access Control Lists on Active Directory Objects'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '3.0'
