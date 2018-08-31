@@ -6,7 +6,7 @@ data LocalizedData
         # Common Messages
         ADPSDriveError                          = An error occurred connecting to AD: PSDrive for Server '{0}'.
         ADDefaultPSDriveError                   = An error occurred connecting to AD: PSDrive for the default domain.
-        IdentityNotFound                        = An error occurred locating an object with the identity specified ('{0}'). Identities must be passed in either distinguishedName or objectGUID format, or as a reference object. 
+        IdentityNotFound                        = An error occurred locating an object with the identity specified ('{0}'). Identities must be passed in either distinguishedName or objectGUID format, or as a reference object.
         IdentityTypeInvalid                     = An error occurred validating the identity reference ('{0}'). Reference objects must include either a distinguishedName or objectGUID property.
         GetAclError                             = An error occurred running Get-Acl on object '{0}'.
         NetBIOSDomainError                      = An error occurred resolving NetBIOS Domain Name for the Domain.
@@ -77,9 +77,9 @@ data LocalizedData
 
     Gets all permissions from the 'Users' container from the default Active Directory Domain which are granted over objects of type 'user'.
 .EXAMPLE
-    Get-ADObjectAcl -Identity "cn=Users,DC=contoso,DC=com" -ObjectTypeName RAS-Information -InheritedObjectTypeName user 
+    Get-ADObjectAcl -Identity "cn=Users,DC=contoso,DC=com" -ObjectTypeName RAS-Information -InheritedObjectTypeName user
 
-    Gets all permissions from the 'Users' container from the default Active Directory Domain which are granted over object type of 'RAS-Information' and inherited object of type of 'user'. 
+    Gets all permissions from the 'Users' container from the default Active Directory Domain which are granted over object type of 'RAS-Information' and inherited object of type of 'user'.
 .INPUTS
    The identity parameter of the CmdLet accepts either a distinguishedName or ObjectGUID or AD Objects. AD Objects which are passed by reference must include either a distinguishedName or ObjectGUID property.
 .OUTPUTS
@@ -89,12 +89,13 @@ function Get-ADObjectAcl
 {
     [CmdletBinding(SupportsShouldProcess = $false, PositionalBinding = $true)]
     [OutputType([Object])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
     Param(
         # The Identity of the Active Directory Object in either distinguishedName or GUID format or by reference.
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false, Position = 1)]
         [object]
         $Identity,
-        
+
         # The target Active Directory Server / Domain Controller.
         [Parameter(Mandatory = $false, ValueFromPipeline = $false)]
         [string]
@@ -167,7 +168,7 @@ function Get-ADObjectAcl
             Push-Location -StackName 'cActiveDirectorySecurity' # keep a record of the current location
 
             $PSDriveParams = @{"ErrorAction" = "Stop"}
-        
+
             if ($PSBoundParameters.ContainsKey('Credential'))
             {
                 $PSDriveParams.Add("Credential", $Credential)
@@ -176,7 +177,7 @@ function Get-ADObjectAcl
             {
                 $PSDriveParams.Add("Server", $Server)
             }
-            else 
+            else
             {
                 $Server = (Get-AdDomain).NetBIOSName
             }
@@ -231,9 +232,9 @@ function Get-ADObjectAcl
         $localLocationStack = (Get-Location -StackName 'Get-ADObjectAcl' -ErrorAction SilentlyContinue)
         if ((Get-Location).Path -ne $LocalLocationStack.Path)
         {
-            Pop-Location -StackName 'Get-ADObjectAcl' -ErrorAction SilentlyContinue 
+            Pop-Location -StackName 'Get-ADObjectAcl' -ErrorAction SilentlyContinue
         }
-        
+
         # determine whether a string or reference object has been passed
         if ($Identity -is "String")
         {
@@ -264,7 +265,7 @@ function Get-ADObjectAcl
         try
         {
             Write-Verbose " Extracting Access Control List."
-            $Permissions = (Get-Acl -Path $Identity.DistinguishedName).Access    
+            $Permissions = (Get-Acl -Path $Identity.DistinguishedName).Access
         }
         catch
         {
@@ -272,7 +273,7 @@ function Get-ADObjectAcl
             Write-Error $_
             Return $null
         }
-        
+
         forEach ($Permission in $Permissions)
         {
             $IdentityReferenceLabel = $null
@@ -287,9 +288,9 @@ function Get-ADObjectAcl
                 {
                     $IdentityReferenceLabel = $objectSIDs.($Permission.IdentityReference.Value)
                 }
-                else 
+                else
                 {
-                    try 
+                    try
                     {
                         $IdentityReferenceLabel = (Resolve-ObjectSidToName -Sid $Permission.IdentityReference)
                     }
@@ -297,7 +298,7 @@ function Get-ADObjectAcl
                     {
                         # ignore errors returned by the Resolve-ObjectSidToName function and continue
                     }
-                    
+
                     # add the resolved name to objectSIDs to prevent having to resolve the same SID again
                     $objectSIDs.Add($Permission.IdentityReference.Value, $IdentityReferenceLabel)
                 }
@@ -306,7 +307,7 @@ function Get-ADObjectAcl
             {
                 $IdentityReferenceLabel = $Permission.IdentityReference
             }
-            
+
             # filter the ACE items returned, based on the parameters which have been passed.
             if ($PSBoundParameters.ContainsKey('IsInherited'))
             {
@@ -401,7 +402,7 @@ function Get-ADObjectAcl
         # no need to perform AD PSDrive clear down if the command is being called by another function within the same module
         if ( ((Get-PSCallStack)[0].Location).Split(":")[0] -ne ((Get-PSCallStack)[1].Location).Split(":")[0])
         {
-            Pop-Location -StackName 'cActiveDirectorySecurity' -ErrorAction SilentlyContinue 
+            Pop-Location -StackName 'cActiveDirectorySecurity' -ErrorAction SilentlyContinue
             if ($null -ne $PSDriveName)
             {
                 Remove-PSDrive -Name $PSDriveName -Force # remove AD PSDrive if one was created
@@ -411,7 +412,7 @@ function Get-ADObjectAcl
         if ($SendToClipboard)
         {
             $props = @("DistinguishedName"
-                "IdentityReference" 
+                "IdentityReference"
                 "IdentityReferenceName"
                 "IdentityReferenceDomain"
                 @{n = "ActiveDirectoryRights"; e = {$_.ActiveDirectoryRights -Join ", "}}
@@ -433,7 +434,7 @@ function Get-ADObjectAcl
             }
             else
             {
-                $report | Select-Object $props | ConvertTo-Csv -Delimiter "`t" -NoTypeInformation | Set-Clipboard    
+                $report | Select-Object $props | ConvertTo-Csv -Delimiter "`t" -NoTypeInformation | Set-Clipboard
             }
         }
         else
@@ -486,7 +487,7 @@ function Add-ADObjectAce
         # The Identity of the Active Directory Object in either distinguishedName or GUID format or by reference.
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false)]
         [object]$Identity,
-        
+
         # The target Active Directory Server / Domain Controller.
         [Parameter(Mandatory = $false, ValueFromPipeline = $false)]
         [string]$Server,
@@ -539,7 +540,7 @@ function Add-ADObjectAce
         Push-Location # keep a record of the current location
 
         $PSDriveParams = @{"ErrorAction" = "Stop"}
-        
+
         if ($PSBoundParameters.ContainsKey('Credential'))
         {
             $PSDriveParams.Add("Credential", $Credential)
@@ -548,7 +549,7 @@ function Add-ADObjectAce
         {
             $PSDriveParams.Add("Server", $Server)
         }
-        else 
+        else
         {
             $Server = (Get-AdDomain).NetBIOSName
         }
@@ -622,7 +623,7 @@ function Add-ADObjectAce
         try
         {
             $sid = (Resolve-NameToObjectSid -IdentityReference $IdentityReference)
-            $NewAceParams += $sid    
+            $NewAceParams += $sid
         }
         catch
         {
@@ -636,11 +637,11 @@ function Add-ADObjectAce
             Write-Warning -Message ($LocalizedData.IdentityReferenceInvalid -f $IdentityReference)
             Return $null
         }
-        else 
+        else
         {
             Write-Verbose " Identity Reference $($IdentityReference.distinguishedName) translated to Sid value ($Sid)."
         }
-        
+
         # convert ActiveDirectoryRights into ActiveDirectoryRights Object for generating the Ace
         $ActiveDirectoryRightsObject = [System.DirectoryServices.ActiveDirectoryRights]$ActiveDirectoryRights
         $NewAceParams += $ActiveDirectoryRightsObject
@@ -656,7 +657,7 @@ function Add-ADObjectAce
                 # retrieve the object Type Guid
                 $ObjectType = Get-ADObjectRightsGUID -Name $ObjectTypeName
             }
-            catch 
+            catch
             {
                 Write-Error $_
                 Return $null
@@ -667,7 +668,7 @@ function Add-ADObjectAce
                 Write-Warning -Message ($LocalizedData.ObjectTypeNameNotFound -f ($ObjectTypeName))
                 Return $null
             }
-            else 
+            else
             {
                 $ObjectTypeGUID = $ObjectType.Keys | Select-Object -First 1
                 Write-Verbose " ObjectTypeName of $ObjectTypeName resolved to GUID $ObjectTypeGUID."
@@ -691,7 +692,7 @@ function Add-ADObjectAce
                 # retrieve the inherited object type Guid
                 $InheritedObjectType = Get-ADObjectRightsGUID -Name $InheritedObjectTypeName
             }
-            catch 
+            catch
             {
                 Write-Error $_
                 Return $null
@@ -702,16 +703,16 @@ function Add-ADObjectAce
                 Write-Warning -Message ($LocalizedData.InheritedObjectTypeNameNotFound -f ($InheritedObjectTypeName))
                 Return $null
             }
-            else 
+            else
             {
                 $InheritedObjectTypeGUID = $InheritedObjectType.Keys | Select-Object -First 1
                 Write-Verbose " InheritedObjectTypeName of $InheritedObjectTypeName resolved to GUID $InheritedObjectTypeGUID."
                 $NewAceParams += $InheritedObjectTypeGUID
             }
         }
-        
+
         # create the new ACE
-        try 
+        try
         {
             Write-Verbose " Creating new ACE."
             $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($NewAceParams)
@@ -720,7 +721,7 @@ function Add-ADObjectAce
         {
             Write-Warning -Message ($LocalizedData.CreateNewAceError -f $Identity.DistinguishedName)
             Write-Error $_
-            Return $null   
+            Return $null
         }
 
         if ($Force -or $pscmdlet.ShouldProcess($Identity.DistinguishedName, "Add new Access Control Entry."))
@@ -742,7 +743,7 @@ function Add-ADObjectAce
             try
             {
                 Write-Verbose " Adding new ACE to existing ACL."
-                $Permissions.AddAccessRule($Ace)    
+                $Permissions.AddAccessRule($Ace)
             }
             catch
             {
@@ -750,7 +751,7 @@ function Add-ADObjectAce
                 Write-Error $_
                 Return $null
             }
-        
+
             # finally re-apply the updated Acl to the object
             try
             {
@@ -840,7 +841,7 @@ function Remove-ADObjectAce
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false)]
         [object]
         $Identity,
-        
+
         # The target Active Directory Server / Domain Controller.
         [Parameter(Mandatory = $false, ValueFromPipeline = $false)]
         [string]
@@ -895,16 +896,16 @@ function Remove-ADObjectAce
         $locationStack = (Get-Location -StackName "cActiveDirectorySecurity" -ErrorAction SilentlyContinue)
         if ($locationStack.count -eq 0)
         {
-            Push-Location -StackName 'CActiveDirectorySecurity' -ErrorAction SilentlyContinue # keep a record of the current location    
+            Push-Location -StackName 'CActiveDirectorySecurity' -ErrorAction SilentlyContinue # keep a record of the current location
         }
         else
         {
             Set-Location -Path ($locationStack.Path[0]) -ErrorAction SilentlyContinue
             Push-Location -StackName 'CActiveDirectorySecurity' -Path ($locationStack.Path[0]) -ErrorAction SilentlyContinue
         }
-                       
+
         $PSDriveParams = @{"ErrorAction" = "Stop"}
-        
+
         if ($PSBoundParameters.ContainsKey('Credential'))
         {
             $PSDriveParams.Add("Credential", $Credential)
@@ -913,7 +914,7 @@ function Remove-ADObjectAce
         {
             $PSDriveParams.Add("Server", $Server)
         }
-        else 
+        else
         {
             $Server = (Get-AdDomain).NetBIOSName
         }
@@ -960,7 +961,7 @@ function Remove-ADObjectAce
         $LocalLocationStack = (Get-Location -StackName 'Remote-ADObjectAce' -ErrorAction SilentlyContinue)
         if ((Get-Location).Path -ne ($LocalLocationStack.Path))
         {
-            Pop-Location -StackName 'Remote-ADObjectAce' -ErrorAction SilentlyContinue 
+            Pop-Location -StackName 'Remote-ADObjectAce' -ErrorAction SilentlyContinue
         }
 
         # where the Get-ADObjectAcl function is used to feed this function the reference object passed will be of type cActiveDirectorySecurity.ACE
@@ -1005,7 +1006,7 @@ function Remove-ADObjectAce
         if (-Not ($GetADObjectAclParams.ContainsKey('IsInherited'))) { $GetADObjectAclParams.Add("IsInherited", $False) | Out-Null }
 
         # confirm that the ACE to remove is actually present - using Get-ADObjectAcl
-        try 
+        try
         {
             $Ace = Get-ADObjectAcl @GetADObjectAclParams
         }
@@ -1015,7 +1016,7 @@ function Remove-ADObjectAce
             Return $null
         }
 
-        # no ACE found matching the specified filter 
+        # no ACE found matching the specified filter
         if ($null -eq $Ace)
         {
             Write-Warning -Message ($LocalizedData.AceNotFound -F $Identity)
@@ -1046,7 +1047,6 @@ function Remove-ADObjectAce
         $MatchedAce = $null
         forEach ($Permission in $Permissions.Access)
         {
-            
             if ($Permission.ActiveDirectoryRights -ne $Ace.ActiveDirectoryRights)
             {
                 Continue
@@ -1110,7 +1110,7 @@ function Remove-ADObjectAce
             try
             {
                 Write-Verbose " Removing matching ACE from the existing ACL."
-                $Permissions.RemoveAccessRuleSpecific($MatchedAce)    
+                $Permissions.RemoveAccessRuleSpecific($MatchedAce)
             }
             catch
             {
@@ -1118,7 +1118,7 @@ function Remove-ADObjectAce
                 Write-Error $_
                 Return $null
             }
-        
+
             # finally re-apply the updated Acl to the object
             try
             {
@@ -1192,7 +1192,8 @@ function Get-ADObjectRightsGUID
     [CmdletBinding(DefaultParameterSetName = 'None',
         SupportsShouldProcess = $false,
         PositionalBinding = $false)]
-    [OutputType([Object[]])]
+    [OutputType([System.Collections.Hashtable])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingEmptyCatchBlock", "")]
     Param
     (
         # the Name of the schema object or control access right to retrieve
@@ -1222,21 +1223,21 @@ function Get-ADObjectRightsGUID
         catch
         {
             Write-Warning -Message ($LocalizedData.RootDSEError -f $DomainName)
-            Pop-Location         
+            Pop-Location
             throw $_
         }
 
         $schemaAndAccessRights = @{}
-        
+
         switch ($PSCmdlet.ParameterSetName)
         {
-            'Name' 
+            'Name'
             {
                 if ("All" -eq $Name)
                 {
                     $schemaAndAccessRights.Add([System.GUID]'00000000-0000-0000-0000-000000000000', 'All')
                 }
-                else 
+                else
                 {
                     try
                     {
@@ -1249,11 +1250,11 @@ function Get-ADObjectRightsGUID
 
                     try
                     {
-                        $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -LDAPFilter "(&(objectClass=controlAccessRight)(Name=$Name))" -Properties name, rightsGUID 
+                        $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -LDAPFilter "(&(objectClass=controlAccessRight)(Name=$Name))" -Properties name, rightsGUID
                     }
                     catch
                     {
-                        # ignore errors 
+                        # ignore errors
                     }
 
                     if (($null -eq $schemaObjects) -and ($null -eq $accessRights))
@@ -1262,7 +1263,7 @@ function Get-ADObjectRightsGUID
                     }
                 }
             }
-            'GUID' 
+            'GUID'
             {
                 # determine whether a string or GUID value has been passed
                 if (($GUID -is [GUID]) -or ($GUID -is [String]))
@@ -1288,11 +1289,11 @@ function Get-ADObjectRightsGUID
 
                         try
                         {
-                            $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -Filter {rightsGUID -eq $GUID} -Properties name, rightsGUID 
+                            $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -Filter {rightsGUID -eq $GUID} -Properties name, rightsGUID
                         }
                         catch
                         {
-                            # ignore errors 
+                            # ignore errors
                         }
 
                         if (($null -eq $schemaObjects) -and ($null -eq $accessRights))
@@ -1309,11 +1310,11 @@ function Get-ADObjectRightsGUID
             Default
             {
                 $schemaAndAccessRights.Add([System.GUID]'00000000-0000-0000-0000-000000000000', 'All')
-                $schemaObjects = Get-ADObject -SearchBase $schemaNamingContext -LDAPFilter '(schemaIDGUID=*)' -Properties name, schemaIDGUID 
-                $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -LDAPFilter '(objectClass=controlAccessRight)' -Properties name, rightsGUID 
+                $schemaObjects = Get-ADObject -SearchBase $schemaNamingContext -LDAPFilter '(schemaIDGUID=*)' -Properties name, schemaIDGUID
+                $accessRights = Get-ADObject -SearchBase "CN=Extended-Rights,$configurationNamingContext" -LDAPFilter '(objectClass=controlAccessRight)' -Properties name, rightsGUID
             }
         }
-        
+
         ForEach ($schemaObject in $schemaObjects)
         {
             try
@@ -1372,9 +1373,9 @@ function Get-ADObjectRightsGUID
 #>
 function Resolve-ObjectSidToName
 {
-    [CmdletBinding(SupportsShouldProcess = $false, 
+    [CmdletBinding(SupportsShouldProcess = $false,
         PositionalBinding = $true)]
-    [OutputType([Object])]
+    [OutputType([System.Security.Principal.IdentityReference])]
     Param
     (
         # The security identifier to translate
@@ -1402,7 +1403,7 @@ function Resolve-ObjectSidToName
         {
             Write-Warning -Message ($LocalizedData.GetADObjectSidError -f ($sid.Value))
             throw $_
-        } 
+        }
 
         if ($null -ne $ADObject)
         {
@@ -1422,8 +1423,8 @@ function Resolve-ObjectSidToName
                 catch
                 {
                     Write-Warning -Message ($LocalizedData.NetBIOSDomainError)
-                } 
-                
+                }
+
                 if ($null -ne $DomainNetBIOSName)
                 {
                     Write-Verbose ("$DomainNetBIOSName\" + $ADObject.sAMAccountName)
@@ -1436,7 +1437,7 @@ function Resolve-ObjectSidToName
                 }
             }
         }
-        else 
+        else
         {
             # if object cannot be found then return the original Sid value
             Return $sid
@@ -1463,9 +1464,9 @@ function Resolve-ObjectSidToName
 #>
 function Resolve-NameToObjectSid
 {
-    [CmdletBinding(SupportsShouldProcess = $false, 
+    [CmdletBinding(SupportsShouldProcess = $false,
         PositionalBinding = $true)]
-    [OutputType([Object])]
+    [OutputType([System.Security.Principal.IdentityReference])]
     Param
     (
         # The IdentityReference to Translate
@@ -1491,11 +1492,11 @@ function Resolve-NameToObjectSid
         {
             { (($null -eq $_) -or ("NT AUTHORITY" -eq $_ )) }
             {
-                Write-Verbose " Translating name to Sid using Translate()."  
+                Write-Verbose " Translating name to Sid using Translate()."
                 try
                 {
-                    $ntAccount = new-object System.Security.Principal.NTAccount($IdentityReference) 
-                    $objectSid = $ntAccount.Translate([System.Security.Principal.SecurityIdentifier]) 
+                    $ntAccount = new-object System.Security.Principal.NTAccount($IdentityReference)
+                    $objectSid = $ntAccount.Translate([System.Security.Principal.SecurityIdentifier])
                 }
                 catch
                 {
@@ -1509,7 +1510,7 @@ function Resolve-NameToObjectSid
             {
                 # most sids are resolved using Get-AdObject. Ideally would prefer to use Translate([System.Security.Principal.SecurityIdentifier]) but doesn't work very well
                 # with anything but the current domain or with certain BUILTIN security principals and don't really want to maintain tables of well-known-sids
-                Write-Verbose " Resolving name to objectSid using Get-ADObject."  
+                Write-Verbose " Resolving name to objectSid using Get-ADObject."
 
                 try
                 {
@@ -1519,12 +1520,12 @@ function Resolve-NameToObjectSid
                 {
                     Write-Warning -Message ($LocalizedData.NetBIOSDomainError)
                     throw $_
-                } 
+                }
 
                 # build param list to splat to Get-ADObject
                 $GetADObjectParams = @{"filter" = ("sAMAccountName -eq " + '"' + $AccountName + '"' + ""); "properties" = "objectSid"; "ErrorAction" = "Stop"}
                 if (($DomainName -ne $DomainNetBIOSName) -and ($DomainName -ne "BUILTIN"))
-                { 
+                {
                     $GetADObjectParams.Add("Server", $DomainName)
                 }
 
@@ -1537,17 +1538,17 @@ function Resolve-NameToObjectSid
                     Write-Warning -Message ($LocalizedData.GetADObjectNameError -f $IdentityReference, $AccountName)
                     throw $_
                 }
-                
+
                 if ($null -ne $ADObject)
                 {
                     # return the objectSID
                     Return ($ADObject.objectSID)
                 }
-                else 
+                else
                 {
                     # else return $null
                     Return $null
-                }  
+                }
             }
         }
     }

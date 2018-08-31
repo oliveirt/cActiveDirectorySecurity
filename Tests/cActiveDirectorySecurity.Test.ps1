@@ -124,8 +124,8 @@ try
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Context "Gather permissions from the root of the default (CONTOSO) Domain." {
-                Mock -CommandName Get-Acl -MockWith { 
-                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions 
+                Mock -CommandName Get-Acl -MockWith {
+                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions
                     $permissions = $ContosoAcl | Select-Object -Property @(
                         "ActiveDirectoryRights"
                         "InheritanceType"
@@ -192,8 +192,8 @@ try
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Context "Gather all permissions from the Domain Controllers Organizational Units of the default (CONTOSO) Domain." {
-                Mock -CommandName Get-Acl -MockWith { 
-                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainControllersPermissions 
+                Mock -CommandName Get-Acl -MockWith {
+                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainControllersPermissions
                     $permissions = $ContosoAcl | Select-Object -Property @(
                         "ActiveDirectoryRights"
                         "InheritanceType"
@@ -277,8 +277,8 @@ try
             Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
-            Mock -CommandName Get-Acl -MockWith { 
-                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions 
+            Mock -CommandName Get-Acl -MockWith {
+                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions
                 $permissions = $ContosoAcl | Select-Object -Property @(
                     "ActiveDirectoryRights"
                     "InheritanceType"
@@ -326,7 +326,7 @@ try
                 Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
                 Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
                 Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
-                $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights GenericRead -AccessControlType Allow -InheritanceType Descendents -InheritedObjectTypeName "Group" 
+                $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights GenericRead -AccessControlType Allow -InheritanceType Descendents -InheritedObjectTypeName "Group"
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights GenericRead -AccessControlType Allow -InheritanceType Descendents -InheritedObjectTypeName "Group" -WhatIf
                 forEach ($prop in $props)
                 {
@@ -342,7 +342,7 @@ try
                 Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=DS-Replication-Get-Changes-All))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'DS-Replication-Get-Changes-All'} } -Verifiable
                 Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
                 Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
-                $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Domain Controllers" -ActiveDirectoryRights ExtendedRight -AccessControlType Allow -ObjectTypeName "DS-Replication-Get-Changes-All" 
+                $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Domain Controllers" -ActiveDirectoryRights ExtendedRight -AccessControlType Allow -ObjectTypeName "DS-Replication-Get-Changes-All"
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Domain Controllers" -ActiveDirectoryRights ExtendedRight -AccessControlType Allow -ObjectTypeName "DS-Replication-Get-Changes-All" -WhatIf
                 forEach ($prop in $props)
                 {
@@ -394,8 +394,8 @@ try
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Pop-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
-            Mock -CommandName Get-Acl -MockWith { 
-                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainGBGroupPermissions 
+            Mock -CommandName Get-Acl -MockWith {
+                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainGBGroupPermissions
                 $permissions = $ContosoAcl | Select-Object -Property @(
                     "ActiveDirectoryRights"
                     "InheritanceType"
@@ -437,21 +437,20 @@ try
                 Mock -CommandName Get-ADObject -MockWith { New-Object -TypeName PSObject -Property @{"Name" = "Groups"; "DistinguishedName" = "OU=Groups,OU=GB,DC=contoso,DC=com" } }
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs"
                 $Ace2 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs" | Remove-ADObjectAce -Whatif
-                for ($i = 0; $i -lt $Ace1.count; $i++) 
+                for ($i = 0; $i -lt $Ace1.count; $i++)
                 {
                     forEach ($prop in $props)
                     {
                         It "Compares the $prop property of the two Access Control Entries." {
                             Compare-Object -ReferenceObject $Ace1[$i] -DifferenceObject $Ace2[$i] -Property $prop | Should Be $null
                         }
-                    }     
+                    }
                 }
-                
             }
         }
-    } 
+    }
 }
-catch 
+catch
 {
     throw $_
 }
