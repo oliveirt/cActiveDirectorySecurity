@@ -110,7 +110,7 @@
             # ReleaseNotes = ''
 
             # External dependent modules of this module
-            # ExternalModuleDependencies = ''
+            ExternalModuleDependencies = 'ActiveDirectory'
 
         } # End of PSData hashtable
 
