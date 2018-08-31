@@ -15,17 +15,19 @@ try
 {
     InModuleScope $ModuleName {
         Describe "Test the Get-ADObjectRightsGUID function which enumerates Active Directory Schema and Extended Rights GUIDs." {
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Context "Retrieve all Schema and Extended Rights GUIDs and their names." {
-                Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) }
-                Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
+                Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { $mockSchemaObjects }
+                Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { $mockAccessRights }
                 It "Test that all the Active Directory Schema Object and Extended Rights GUID retrieved from the (mocked) contoso.com Domain total 1843 in number." {
                     (Get-ADObjectRightsGUID).count | Should Be 1843
                 }
             }
             Context "Retrieve a Schema object matching a specific name filter." {
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computer))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computer'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computer))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computer'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computer))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Computer'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computer))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Computer'} } -Verifiable
                 It "Test that when a Name filter is provided only the relevant schema object is returned (computer)." {
                     $rtVal = Get-ADObjectRightsGUID -Name 'Computer'
                     $rtVal.Values | Select-Object -First 1 | Should Be 'Computer'
@@ -34,8 +36,8 @@ try
                 }
             }
             Context "Retrieve an Extended Right matching a specific name filter." {
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Personal-Information))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Personal-Information'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Personal-Information))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Personal-Information'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Personal-Information))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Personal-Information'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Personal-Information))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Personal-Information'} } -Verifiable
                 It "Test that when a Name filter is provided only the relevant extended right object is returned (Personal-Information)." {
                     $rtVal = Get-ADObjectRightsGUID -Name 'Personal-Information'
                     $rtVal.Values | Select-Object -First 1 | Should Be 'Personal-Information'
@@ -45,8 +47,8 @@ try
             }
             Context "Retrieve an Extended Right matching a specific GUID filter." {
                 $PersonalInformationGUID = [GUID]"77B5B886-944A-11d1-AEBD-0000F80367C1"
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*" } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq ($PersonalInformationGUID.ToString())} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*" } -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq ($PersonalInformationGUID.ToString())} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*" } -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq ($PersonalInformationGUID.ToString())} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*" } -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq ($PersonalInformationGUID.ToString())} } -Verifiable
                 It "Test that when a GUID filter is provided only the relevant extended right object is returned (Personal-Information)." {
                     $rtVal = Get-ADObjectRightsGUID -GUID $PersonalInformationGUID
                     $rtVal.Values | Select-Object -First 1 | Should Be 'Personal-Information'
@@ -56,8 +58,8 @@ try
             }
             Context "Retrieve an Schema object matching a specific GUID filter." {
                 $ComputerGUID = [GUID]"bf967a86-0de6-11d0-a285-00aa003049e2"
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*" } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq ($ComputerGUID.ToString())} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*" } -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq ($ComputerGUID.ToString())} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*" } -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq ($ComputerGUID.ToString())} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*" } -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq ($ComputerGUID.ToString())} } -Verifiable
                 It "Test that when a GUID filter is provided only the relevant extended right object is returned (Computer)." {
                     $rtVal = Get-ADObjectRightsGUID -GUID $ComputerGUID
                     $rtVal.Values | Select-Object -First 1 | Should Be 'Computer'
@@ -66,8 +68,8 @@ try
                 }
             }
             Context "The Schema Object / Extended Right specified cannot be found." {
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
                 It "Tests that a null value is returned where the specified Schema Object / Extended Right doesn't exist." {
                     Get-ADObjectRightsGUID -Name 'Computers' | Should Be $null
                     Assert-MockCalled -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -Times 1
@@ -116,16 +118,19 @@ try
             }
         }
         Describe "Simulate calls to the Get-ADObjectAcl functions with mock data from the root of the default (CONTOSO) Domain." {
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
+            $mockPermissions = (Get-Content -Path "$PSScriptRoot\MockPermissions.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Mock -CommandName Get-ADDomain -MockWith { New-Object -TypeName PSObject -Property @{"NetBIOSName" = "CONTOSO"} }
             $Identity = New-Object -TypeName PSObject -Property @{"Name" = "CONTOSO"; "DistinguishedName" = "DC=contoso,DC=com" ; "DNSRoot" = "contoso.com"}
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { $mockSchemaObjects }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { $mockAccessRights }
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Context "Gather permissions from the root of the default (CONTOSO) Domain." {
                 Mock -CommandName Get-Acl -MockWith {
-                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions
+                    $ContosoAcl = $mockPermissions.ContosoDomainPermissions
                     $permissions = $ContosoAcl | Select-Object -Property @(
                         "ActiveDirectoryRights"
                         "InheritanceType"
@@ -184,16 +189,19 @@ try
             }
         }
         Describe "Simulate calls to the Get-ADObjectAcl functions with mock data from the Domain Controllers Organizational Unit of the default (CONTOSO) Domain." {
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
+            $mockPermissions = (Get-Content -Path "$PSScriptRoot\MockPermissions.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Mock -CommandName Get-ADDomain -MockWith { New-Object -TypeName PSObject -Property @{"NetBIOSName" = "CONTOSO"} }
             $Identity = New-Object -TypeName PSObject -Property @{"Name" = "Domain Controllers"; "DistinguishedName" = "OU=Domain Controllers,DC=contoso,DC=com"}
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { $mockSchemaObjects }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { $mockAccessRights }
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Context "Gather all permissions from the Domain Controllers Organizational Units of the default (CONTOSO) Domain." {
                 Mock -CommandName Get-Acl -MockWith {
-                    $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainControllersPermissions
+                    $ContosoAcl = $mockPermissions.ContosoDomainControllersPermissions
                     $permissions = $ContosoAcl | Select-Object -Property @(
                         "ActiveDirectoryRights"
                         "InheritanceType"
@@ -222,13 +230,15 @@ try
             }
         }
         Describe "Test some basic error handling of the Add-ADObjectAce function." {
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Mock -CommandName Get-ADDomain -MockWith { New-Object -TypeName PSObject -Property @{"NetBIOSName" = "CONTOSO"} }
             Mock -CommandName Set-Location -MockWith { }
             Context "The specified Identity cannot be found." {
                 Mock Get-ADObject -MockWith { throw "Get-ADObject : Cannot find an object with identity: 'CN=JoeB,CN=Users,DC=contoso,DC=com' under: 'DC=contoso,DC=com'."}
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
                 Mock -CommandName Write-Warning -MockWith { } -ParameterFilter {$Message -like "An error occurred locating an object with the identity specified ('CN=JoeB,CN=Users,DC=contoso,DC=com').*"  } -Verifiable
                 Mock -CommandName Write-Error -MockWith {} -Verifiable
                 It "Generates a warning and error message when the specified Identity cannot be found." {
@@ -249,8 +259,8 @@ try
             Context "The specified ObjectTypeName cannot be found." {
                 $Identity = New-Object -TypeName PSObject -Property @{"Name" = "Domain Controllers"; "DistinguishedName" = "OU=Domain Controllers,DC=contoso,DC=com"}
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Domain Admins"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-516")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Computers))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
                 Mock -CommandName Write-Warning -MockWith { } -ParameterFilter {$Message -eq "An error occurred locating the ObjectTypeName with the name specified ('Computers')."} -Verifiable
                 It "Generates a warning and error message when the specified ObjectTypeName cannot be found and returns a null value." {
                     Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Domain Admins" -ActiveDirectoryRights CreateChild, DeleteChild -ObjectTypeName 'Computers' -InheritedObjectTypeName 'All'  | Should Be $null
@@ -260,8 +270,8 @@ try
             Context "The specified InheritedObjectTypeName cannot be found." {
                 $Identity = New-Object -TypeName PSObject -Property @{"Name" = "Computers"; "DistinguishedName" = "CN=Computers,DC=contoso,DC=com"}
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Domain Admins"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-516")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=ms-TPM-Tpm-Information-For-Computer))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'ms-TPM-Tpm-Information-For-Computer'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=ms-TPM-Tpm-Information-For-Computer))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'ms-TPM-Tpm-Information-For-Computer'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Computers))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Computers'} } -Verifiable
                 Mock -CommandName Write-Warning -MockWith { } -ParameterFilter {$Message -eq "An error occurred locating the InheritedObjectTypeName with the name specified ('Computers')."} -Verifiable
                 It "Generates a warning when the specified ObjectTypeName cannot be found and returns a null value." {
                     Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Domain Admins" -ActiveDirectoryRights WriteProperty -ObjectTypeName 'ms-TPM-Tpm-Information-For-Computer' -InheritedObjectTypeName 'Computers'  | Should Be $null
@@ -271,14 +281,17 @@ try
         }
         Describe "Use the Add-ADObjectAce function to generate some Access Control Entries and ensure they compare to their equivalents." {
             # https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryaccessrule(v=vs.110).aspx
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
+            $mockPermissions = (Get-Content -Path "$PSScriptRoot\MockPermissions.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Mock -CommandName Get-ADDomain -MockWith { New-Object -TypeName PSObject -Property @{"NetBIOSName" = "CONTOSO"} }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { $mockSchemaObjects }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { $mockAccessRights }
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Mock -CommandName Get-Acl -MockWith {
-                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainPermissions
+                $ContosoAcl = $mockPermissions.ContosoDomainPermissions
                 $permissions = $ContosoAcl | Select-Object -Property @(
                     "ActiveDirectoryRights"
                     "InheritanceType"
@@ -322,10 +335,10 @@ try
             Context "Retrieve a specific ACE from the root of the default (CONTOSO) Domain and compare it to an equivalent ACE generated by Add-ADObjectAce (IdentityReference, ActiveDirectoryRights, AccessControlType, ActiveDirectorySecurityInheritance, Guid) (-Whatif)." {
                 # https://msdn.microsoft.com/en-us/library/4b75624d(v=vs.110).aspx
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "BUILTIN\Pre-Windows 2000 Compatible Access"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-554")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights GenericRead -AccessControlType Allow -InheritanceType Descendents -InheritedObjectTypeName "Group"
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights GenericRead -AccessControlType Allow -InheritanceType Descendents -InheritedObjectTypeName "Group" -WhatIf
                 forEach ($prop in $props)
@@ -338,10 +351,10 @@ try
             Context "Retrieve a specific ACE from the root of the default (CONTOSO) Domain and compare it to an equivalent ACE generated by Add-ADObjectAce (IdentityReference, ActiveDirectoryRights, AccessControlType, Guid) (-Whatif)." {
                 # https://msdn.microsoft.com/en-us/library/sskw937h(v=vs.110).aspx
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Domain Controllers"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-516")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=DS-Replication-Get-Changes-All))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'DS-Replication-Get-Changes-All'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=DS-Replication-Get-Changes-All))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'DS-Replication-Get-Changes-All'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=DS-Replication-Get-Changes-All))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'DS-Replication-Get-Changes-All'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=DS-Replication-Get-Changes-All))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'DS-Replication-Get-Changes-All'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq '1131f6ad-9c07-11d1-f79f-00c04fc2dcd2'} } -Verifiable
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Domain Controllers" -ActiveDirectoryRights ExtendedRight -AccessControlType Allow -ObjectTypeName "DS-Replication-Get-Changes-All"
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Domain Controllers" -ActiveDirectoryRights ExtendedRight -AccessControlType Allow -ObjectTypeName "DS-Replication-Get-Changes-All" -WhatIf
                 forEach ($prop in $props)
@@ -354,10 +367,10 @@ try
             Context "Retrieve a specific ACE from the root of the default (CONTOSO) Domain and compare it to an equivalent ACE generated by Add-ADObjectAce (IdentityReference, ActiveDirectoryRights, AccessControlType, Guid, ActiveDirectorySecurityInheritance) (-Whatif)." {
                 # https://msdn.microsoft.com/en-us/library/cawwkf0x(v=vs.110).aspx
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Key Admins"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-526")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=ms-DS-Key-Credential-Link))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'ms-DS-Key-Credential-Link'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=ms-DS-Key-Credential-Link))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'ms-DS-Key-Credential-Link'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=ms-DS-Key-Credential-Link))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'ms-DS-Key-Credential-Link'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=ms-DS-Key-Credential-Link))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'ms-DS-Key-Credential-Link'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq '5b47d60f-6090-40b2-9f37-2a4de88f3063'} } -Verifiable
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Key Admins" -ActiveDirectoryRights ReadProperty, WriteProperty -AccessControlType Allow -ObjectTypeName "ms-DS-Key-Credential-Link" -InheritanceType All
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Key Admins" -ActiveDirectoryRights ReadProperty, WriteProperty -AccessControlType Allow -ObjectTypeName "ms-DS-Key-Credential-Link" -InheritanceType All -WhatIf
                 forEach ($prop in $props)
@@ -370,12 +383,12 @@ try
             Context "Retrieve a specific ACE from the root of the default (CONTOSO) Domain and compare it to an equivalent ACE generated by Add-ADObjectAce (IdentityReference, ActiveDirectoryRights, AccessControlType, Guid, ActiveDirectorySecurityInheritance, Guid) (-Whatif)." {
                 # https://msdn.microsoft.com/en-us/library/w72e8e69(v=vs.110).aspx
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "BUILTIN\Pre-Windows 2000 Compatible Access"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-554")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=User))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'User'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=General-Information))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'General-Information'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=User))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'User'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=General-Information))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'General-Information'} } -Verifiable
                 $objectTypeGUID = [GUID]'59ba2f42-79a2-11d0-9020-00c04fc2d3cf' # General-Information
                 $inheritedObjectTypeGUID = [GUID]'bf967aba-0de6-11d0-a285-00aa003049e2' # user
-                Mock -CommandName Get-ADObjectRightsGUID -ParameterFilter { $GUID -eq $objectTypeGUID } -MockWith { $accessRightsObject = (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq $objectTypeGUID.ToString()}; Return @{[GUID]$accessRightsObject.rightsGUID = $accessRightsObject.Name} } -Verifiable
-                Mock -CommandName Get-ADObjectRightsGUID -ParameterFilter { $GUID -eq $inheritedObjectTypeGUID } -MockWith { $schemaObject = (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq $inheritedObjectTypeGUID.ToString()}; Return @{[GUID]$schemaObject.schemaIDGUID = $schemaObject.Name} } -Verifiable
+                Mock -CommandName Get-ADObjectRightsGUID -ParameterFilter { $GUID -eq $objectTypeGUID } -MockWith { $mockAccessRightsObject = ($mockAccessRights | Where-Object {$_.rightsGUID -eq $objectTypeGUID.ToString()}); Return @{[GUID]$mockAccessRightsObject.rightsGUID = $mockAccessRightsObject.Name} } -Verifiable
+                Mock -CommandName Get-ADObjectRightsGUID -ParameterFilter { $GUID -eq $inheritedObjectTypeGUID } -MockWith { $mockSchemaObject = ($mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq $inheritedObjectTypeGUID.ToString()}); Return @{[GUID]$mockSchemaObject.schemaIDGUID = $mockSchemaObject.Name} } -Verifiable
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights ReadProperty -AccessControlType Allow -ObjectTypeName "General-Information" -InheritanceType Descendents -InheritedObjectTypeName "User"
                 $Ace2 = Add-ADObjectAce -Identity $Identity -IdentityReference "BUILTIN\Pre-Windows 2000 Compatible Access" -ActiveDirectoryRights ReadProperty -AccessControlType Allow -ObjectTypeName "General-Information" -InheritanceType Descendents -InheritedObjectTypeName "User" -WhatIf
                 forEach ($prop in $props)
@@ -387,15 +400,18 @@ try
             }
         }
         Describe "Use the Remove-ADObjectAce function to identify some Access Control Entries for removal and ensure they compare to their equivalents." {
+            $mockSchemaObjects = (Get-Content "$PSScriptRoot\schemaObjects.json" -Raw | ConvertFrom-Json)
+            $mockAccessRights = (Get-Content -Path "$PSScriptRoot\accessRights.json" -Raw | ConvertFrom-Json)
+            $mockPermissions = (Get-Content -Path "$PSScriptRoot\MockPermissions.json" -Raw | ConvertFrom-Json)
             Mock -CommandName Get-ADRootDSE -MockWith { New-Object -TypeName PSObject -Property @{"configurationNamingContext" = "CN=Configuration,DC=contoso,DC=com"; "schemaNamingContext" = "CN=Schema,CN=Configuration,DC=contoso,DC=com"; }}
             Mock -CommandName Get-ADDomain -MockWith { New-Object -TypeName PSObject -Property @{"NetBIOSName" = "CONTOSO"} }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) }
-            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(schemaIDGUID=*)'} -MockWith { $mockSchemaObjects }
+            Mock -CommandName Get-ADObject -ParameterFilter {$LDAPFilter -eq '(objectClass=controlAccessRight)'} -MockWith { $mockAccessRights }
             Mock -CommandName Set-Location -MockWith { }
             Mock -CommandName Pop-Location -MockWith { }
             Mock -CommandName Resolve-ObjectSidToName -MockWith { Return $Sid }
             Mock -CommandName Get-Acl -MockWith {
-                $ContosoAcl = (Get-Content -Path "$ModulePath\Tests\MockPermissions.json" -Raw | ConvertFrom-Json).ContosoDomainGBGroupPermissions
+                $ContosoAcl = $mockPermissions.ContosoDomainGBGroupPermissions
                 $permissions = $ContosoAcl | Select-Object -Property @(
                     "ActiveDirectoryRights"
                     "InheritanceType"
@@ -414,10 +430,10 @@ try
             $Identity = New-Object -TypeName PSObject -Property @{"Name" = "Groups"; "DistinguishedName" = "OU=Groups,OU=GB,DC=contoso,DC=com"}
             Context "Retrieve a specific ACE from the 'OU=Groups,OU=GB,DC=contoso,DC=com' OU and compare it to an equivalent ACE identified by Remove-ADObjectAce (-Whatif)." {
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Joe.Bloggs"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-1112")) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs" -ActiveDirectoryRights GenericAll -AccessControlType Allow -InheritedObjectTypeName Group -InheritanceType Descendents
                 $Ace2 = Remove-ADObjectAce -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs" -ActiveDirectoryRights GenericAll -AccessControlType Allow -InheritedObjectTypeName Group -InheritanceType Descendents -Whatif
                 forEach ($prop in $props)
@@ -430,10 +446,10 @@ try
             Context "Combine use of Get-ADObjectAcl and Remove-ADObjectAce to remove all ACEs for a particular security principal." {
                 Mock -CommandName Resolve-NameToObjectSid -ParameterFilter {$IdentityReference -eq "CONTOSO\Joe.Bloggs"} -MockWith { Return (New-Object System.Security.Principal.SecurityIdentifier("S-1-5-21-2295585024-2604479722-1786026388-1112")) }
                 Mock -CommandName Get-Location -ParameterFilter {$StackName -eq "cActiveDirectorySecurity"} -MockWith { Return (New-Object -TypeName PSObject -Property @{"Path" = "CONTOSO:"}) }
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { (Get-Content "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.Name -eq 'Group'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\schemaObjects.json" -Raw | ConvertFrom-Json) | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
-                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { (Get-Content -Path "$ModulePath\Tests\accessRights.json" -Raw | ConvertFrom-Json) | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(schemaIDGUID=*)(Name=Group))' } -MockWith { $mockSchemaObjects | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $LDAPFilter -eq '(&(objectClass=controlAccessRight)(Name=Group))'} -MockWith { $mockAccessRights | Where-Object {$_.Name -eq 'Group'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*schemaIDGUID*"} -MockWith { $mockSchemaObjects | Where-Object {$_.schemaIDGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
+                Mock -CommandName Get-ADObject -ParameterFilter { $Filter -like "*rightsGUID*"} -MockWith { $mockAccessRights | Where-Object {$_.rightsGUID -eq 'bf967a9c-0de6-11d0-a285-00aa003049e2'} } -Verifiable
                 Mock -CommandName Get-ADObject -MockWith { New-Object -TypeName PSObject -Property @{"Name" = "Groups"; "DistinguishedName" = "OU=Groups,OU=GB,DC=contoso,DC=com" } }
                 $Ace1 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs"
                 $Ace2 = Get-ADObjectAcl -Identity $Identity -IdentityReference "CONTOSO\Joe.Bloggs" | Remove-ADObjectAce -Whatif
